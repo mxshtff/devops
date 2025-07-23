@@ -1,2 +1,2 @@
 # devops
-study
+study + имитация рефакторинга файла 123123sdfsdf

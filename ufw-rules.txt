@@ -1,11 +1,12 @@
 Status: active
 
-     To                         Action      From
-     --                         ------      ----
-[ 1] 8080/tcp                   DENY IN     Anywhere
-[ 2] 8080                       ALLOW IN    192.168.1.100
-[ 3] 22/tcp                     ALLOW IN    Anywhere
-[ 4] 80/tcp                     ALLOW IN    Anywhere
-[ 5] 8080/tcp (v6)              DENY IN     Anywhere (v6)
-[ 6] 22/tcp (v6)                ALLOW IN    Anywhere (v6)
-[ 7] 80/tcp (v6)                ALLOW IN    Anywhere (v6)
+To                         Action      From
+--                         ------      ----
+8080/tcp                   DENY        Anywhere                  
+8080                       ALLOW       192.168.1.100             
+22/tcp                     ALLOW       Anywhere                  
+80/tcp                     ALLOW       Anywhere                  
+8080/tcp                   ALLOW       127.0.0.1                 
+8080/tcp (v6)              DENY        Anywhere (v6)             
+22/tcp (v6)                ALLOW       Anywhere (v6)             
+80/tcp (v6)                ALLOW       Anywhere (v6)   

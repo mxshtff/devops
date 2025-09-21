@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./keys:/var/jenkins_home/.ssh
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+    networks:
+      - jenkins-network
+
+  postgres:
+    image: postgres:12
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: webbooks
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./webbooks_data/data.sql:/docker-entrypoint-initdb.d/data.sql
+    networks:
+      - jenkins-network
+
+  webbooks-app:
+    build:
+      context: ../apps/webbooks
+      dockerfile: Dockerfile
+    container_name: webbooks-app
+    ports:
+      - "8081:8080"
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/webbooks
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+    depends_on:
+      - postgres
+    networks:
+      - jenkins-network
+
+volumes:
+  jenkins_home:
+  postgres_data:
+
+networks:
+  jenkins-network:
+    driver: bridge

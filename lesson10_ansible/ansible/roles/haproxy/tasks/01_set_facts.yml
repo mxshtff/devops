@@ -1,0 +1,19 @@
+# Get server interface name
+- set_fact: 
+    haproxy_vrrp_interface_name: '{{ item }}'
+  loop: '{{ ansible_facts.interfaces }}'
+  when: "'{{ haproxy_vrrp_virtual_ip_address[0:haproxy_vrrp_virtual_ip_address.rfind('.')+1] }}' in ansible_facts.{{ item }}.ipv4.address"
+  # when: "'{{ haproxy_vrrp_virtual_ip_address | replace('.10', '') }}' in ansible_facts.{{ item }}.ipv4.address"
+
+# Set haproxy vrrp vars
+- set_fact:
+    haproxy_vrrp:
+      - name: net_1
+        state: '{{haproxy_vrrp_state}}'
+        interface_name: '{{haproxy_vrrp_interface_name}}'
+        virtual_ip_address: '{{haproxy_vrrp_virtual_ip_address}}'
+        unicast_src_ip: '{{ansible_host}}'
+        unicast_peer_ip: '{{haproxy_vrrp_unicast_peer}}'
+
+- debug:
+    msg: '{{ haproxy_vrrp }}'

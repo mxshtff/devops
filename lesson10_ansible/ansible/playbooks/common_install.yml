@@ -1,0 +1,8 @@
+- name: Common configure
+  gather_facts: false
+  hosts: all
+  vars:
+    - java_install: true
+
+  tasks:
+    - include_role: name=common

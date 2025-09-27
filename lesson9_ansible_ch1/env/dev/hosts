@@ -1,0 +1,4 @@
+myvm ansible_host=192.168.56.101
+
+[my_group]
+myvm

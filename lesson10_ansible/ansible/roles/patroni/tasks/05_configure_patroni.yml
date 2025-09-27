@@ -1,0 +1,29 @@
+- name: Patroni | Create conf dir
+  file:
+    path: '{{ patroni_conf_dir }}'
+    state: directory
+    owner: '{{ patroni_system.user }}'
+    group: '{{ patroni_system.group }}'
+    mode: 0750
+
+- name: Patroni | Create patroni unit file
+  template:
+    src: patroni.service.j2
+    dest: /usr/lib/systemd/system/patroni.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - systemd daemon reload
+
+- name: Patroni | Create patroni configuration file
+  template:
+    src: patroni.yml.j2
+    dest: "{{ patroni_conf_dir }}/{{ patroni_conf_file }}"
+    owner: "{{ patroni_system.user }}"
+    group: "{{ patroni_system.group }}"
+    mode: 0600
+  notify:
+    - restart patroni
+
+

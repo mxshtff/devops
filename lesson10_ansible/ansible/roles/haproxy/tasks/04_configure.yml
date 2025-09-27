@@ -1,0 +1,23 @@
+- name: HaProxy | Configuring
+  become: true
+  block:
+
+  - name: HaProxy | Configure keepalived
+    template:
+      src: '{{ keepalived_conf_name }}.j2'
+      dest: '{{ keepalived_conf_path }}/{{ keepalived_conf_name }}'
+    notify: Restart keepalived
+
+  - name: HaProxy | Configure haproxy
+    template:
+      src: '{{ haproxy_conf_name }}.j2'
+      dest: '{{ haproxy_conf_path }}/{{ haproxy_conf_name }}'
+      mode: 0644
+    notify: Restart haproxy
+
+  - name: HaProxy | haproxy.cfg bugfix '\n'
+    replace:
+      dest: '{{ haproxy_conf_path }}/{{ haproxy_conf_name }}'
+      regexp: '\\n'
+      replace: ''
+    notify: Restart haproxy

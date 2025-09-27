@@ -1,0 +1,13 @@
+# ./monitoring.service
+
+[Unit]
+Description=Example monitoring service
+
+[Service]
+# Тип запуска сервиса — oneshot для однократного запуска
+Type=oneshot
+# Запускаем команду free
+ExecStart=/usr/bin/free -ht
+
+[Install]
+WantedBy=multi-user.target

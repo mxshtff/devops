@@ -1,0 +1,36 @@
+FROM jenkins/jenkins:lts
+
+# Switch to root user to install packages
+USER root
+
+# Install Java 17 and Maven
+RUN apt-get update && apt-get install -y \
+    openjdk-17-jdk \
+    maven \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set JAVA_HOME to Java 17
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-arm64
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+# Set Maven environment variables
+ENV M2_HOME=/usr/share/maven
+ENV MAVEN_HOME=/usr/share/maven
+ENV PATH=$M2_HOME/bin:$PATH
+
+# Switch back to jenkins user
+USER jenkins
+
+# Install Jenkins plugins
+RUN jenkins-plugin-cli --plugins \
+    maven-plugin \
+    ssh-slaves \
+    publish-over-ssh \
+    git \
+    workflow-aggregator \
+    docker-workflow \
+    github \
+    github-branch-source \
+    multibranch-scan-webhook-trigger \
+    pipeline-stage-view \
+    blueocean

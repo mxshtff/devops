@@ -1,0 +1,5 @@
+---
+- include: 01_set_facts.yml
+- include: 02_user_create.yml
+- include: 03_install.yml
+- include: 04_configure.yml

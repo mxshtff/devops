@@ -1,0 +1,11 @@
+---
+- name: Install Java
+  become: true
+  block:
+
+  - name: Install Java
+    yum:
+      name: "{{ java_package_name }}"
+      state: present
+  
+  when: java_install

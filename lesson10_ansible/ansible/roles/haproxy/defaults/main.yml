@@ -1,0 +1,50 @@
+---
+haproxy_vrrp_priority_master: 100
+haproxy_vrrp_priority_slave: 50
+
+keepalived_conf_path: '/etc/keepalived'
+keepalived_conf_name: keepalived.conf
+haproxy_conf_path: '/etc/haproxy'
+haproxy_conf_name: 'haproxy.cfg'
+
+# system user
+haproxy:
+  user: haproxy
+  group: haproxy
+
+# yum packages for install
+haproxy_yum_packages:
+  - keepalived
+  - haproxy
+
+haproxy_listens:
+- name: pgcluster_is_ready   # patroni health check
+  bind: "*:8008"
+  option: httpchk
+  httpchk_expect_status: 200
+  servers:
+  - name: postgres-1
+    address: 'postgres-1:8008'
+    maxconn: 1000
+    options: check
+    port: 8008
+  - name: postgres-2
+    address: 'postgres-2:8008'
+    maxconn: 1000
+    options: check
+    port: 8008
+- name: pgcluster
+  bind: "*:5432"
+  option: httpchk
+  httpchk_expect_status: 200
+  servers:
+  - name: postgres-1
+    address: 'postgres-1:5432'
+    maxconn: 1000
+    options: check
+    port: 8008
+  - name: postgres-2
+    address: 'postgres-2:5432'
+    maxconn: 1000
+    options: check
+    port: 8008

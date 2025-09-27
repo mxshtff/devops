@@ -1,0 +1,17 @@
+- name: HaProxy | Create system user
+  become: true
+  block:
+
+  - name: HaProxy | Create group 'haproxy'
+    group:
+      name: '{{ haproxy.group }}'
+      state: present
+
+  - name: HaProxy | Create user 'haproxy'
+    user:
+      name:  '{{ haproxy.user }}'
+      comment:  User for HaProxy service
+      group:  '{{ haproxy.group }}'
+      state: present
+      create_home: no
+      system: yes

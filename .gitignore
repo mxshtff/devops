@@ -2,3 +2,8 @@
 /shelf/
 /workspace.xml
 .idea
+
+# DevOps specific
+.vagrant
+.terraform
+*.tfstate*

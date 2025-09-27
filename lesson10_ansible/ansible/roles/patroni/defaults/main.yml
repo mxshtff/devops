@@ -1,0 +1,94 @@
+---
+patroni_system:
+  user: postgres
+  group: postgres
+
+patroni_superuser:
+  username: postgres
+  password: Gjcnuhtc01
+
+patroni_replication:
+  username: replicator
+  password: Htgkbrfnjh01
+
+patroni_dcs: zookeeper
+zookeeper_inventory_group: zookeeper
+patroni_zookeeper_port: 2181
+patroni_conf_dir: /etc/patroni
+patroni_conf_file: '{{ inventory_hostname }}.yml'
+patroni_scope: postgres
+patroni_namespace: /service/
+patroni_name: '{{ inventory_hostname }}'
+patroni_restapi_listen: 0.0.0.0:8008
+patroni_restapi_connect_address: '{{ ansible_host }}:8008'
+
+# https://patroni.readthedocs.io/en/latest/SETTINGS.html#bootstrap-configuration
+patroni_bootstrap_dcs_ttl: 30
+patroni_bootstrap_dcs_loop_wait: 10
+patroni_bootstrap_dcs_retry_timeout: 10
+patroni_bootstrap_dcs_maximum_lag_on_failover: 1048576
+patroni_bootstrap_dcs_master_start_timeout: 300
+patroni_bootstrap_dcs_synchronous_mode: false
+patroni_bootstrap_dcs_synchronous_mode_strict: false
+patroni_bootstrap_dcs_check_timeline: false
+
+patroni_bootstrap_dcs_postgresql_use_pg_rewind: false
+patroni_bootstrap_dcs_postgresql_use_slots: true
+patroni_bootstrap_dcs_postgresql_parameters:
+  - { option: "max_connections",           value: "100" }
+  - { option: "max_locks_per_transaction", value: "64" }
+  - { option: "max_worker_processes",      value: "8" }
+  - { option: "max_prepared_transactions", value: "0" }
+  - { option: "wal_level",                 value: "replica" }
+  - { option: "wal_log_hints",             value: "on" }
+  - { option: "track_commit_timestamp",    value: "off" }
+  - { option: "max_wal_senders",           value: "10" }
+  - { option: "max_replication_slots",     value: "10" }
+  - { option: "wal_keep_segments",         value: "8" }
+
+patroni_bootstrap_initdb:
+  - { option: "encoding", value: "UTF8" }
+  - { option: "data-checksums" }
+
+patroni_bootstrap_dcs_postgresql_pg_hba:
+  - { type: "host", database: "replication", user: "{{ patroni_replication.username }}", address: "0.0.0.0/0", method: "md5" }
+  - { type: "host", database: "all",         user: "all",                                address: "0.0.0.0/0", method: "md5" }
+
+patroni_bootstrap_users:
+  - { name: "{{ patroni_superuser.username }}",   password: "{{ patroni_superuser.password }}",   options: [] }
+  - { name: "{{ patroni_replication.username }}", password: "{{ patroni_replication.password }}", options: ['replication'] }
+
+# postgresql vars
+patroni_postgresql_version: 14
+patroni_postgresql_use_unix_socket: true
+patroni_postgresql_listen: 0.0.0.0:5432
+patroni_postgresql_connect_address: '{{ ansible_host }}:5432'
+patroni_postgresql_data_dir: '/var/lib/pgsql/{{ patroni_postgresql_version }}/data'
+patroni_postgresql_config_dir: '/var/lib/pgsql/{{ patroni_postgresql_version }}/data'
+patroni_postgresql_bin_dir: '/usr/pgsql-{{ patroni_postgresql_version }}/bin'
+patroni_postgresql_pgpass: /var/lib/pgsql/.pgpass
+patroni_bin_dir: /usr/local/bin
+
+# https://patroni.readthedocs.io/en/latest/SETTINGS.html#postgresql
+patroni_postgresql_authentication:
+  - { type: "superuser",   username: "{{ patroni_superuser.username }}",   password: "{{ patroni_superuser.password }}" }
+  - { type: "replication", username: "{{ patroni_replication.username }}", password: "{{ patroni_replication.password }}" }
+
+patroni_postgresql_create_replica_methods:
+  - basebackup
+
+patroni_postgresql_parameters:
+  - { option: "unix_socket_directories", value: "/var/run/postgresql" }
+
+# https://patroni.readthedocs.io/en/latest/SETTINGS.html#watchdog
+# https://patroni.readthedocs.io/en/latest/watchdog.html
+patroni_watchdog_mode: automatic # use quotes for 'off' value
+patroni_watchdog_device: /dev/watchdog
+patroni_watchdog_safety_margin: 5
+
+patroni_tags:
+  - { name: "nofailover",    value: "false" }
+  - { name: "noloadbalance", value: "false" }
+  - { name: "clonefrom",     value: "false" }
+  - { name: "nosync",        value: "false" }
+  - { name: "replicatefrom", value: "" }

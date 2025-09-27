@@ -1,0 +1,14 @@
+---
+# - name: Restart zookeeper
+#   service:
+#     name: '{{ zookeeper_instances.name }}'
+#     enabled: yes
+#     state: restarted
+
+- name: Restart zookeeper
+  ansible.builtin.systemd:
+    daemon_reload: yes
+    name: '{{ item.name }}'
+    state: restarted
+    enabled: true
+  loop: '{{ zookeeper_instances }}'

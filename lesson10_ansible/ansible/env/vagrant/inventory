@@ -1,0 +1,18 @@
+haproxy-1 ansible_host=192.168.56.11 #haproxy_vrrp_state="MASTER" haproxy_vrrp_unicast_peer="192.168.56.12"
+haproxy-2 ansible_host=192.168.56.12 #haproxy_vrrp_state="SLAVE" haproxy_vrrp_unicast_peer="192.168.56.11"
+postgres-1 ansible_host=192.168.56.13
+postgres-2 ansible_host=192.168.56.14
+
+[haproxy]
+haproxy-1
+haproxy-2
+
+[patroni]
+postgres-1
+postgres-2
+
+[zookeeper]
+haproxy-1
+haproxy-2
+postgres-1
+postgres-2

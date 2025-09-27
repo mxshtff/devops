@@ -1,0 +1,11 @@
+
+- name: Patroni | Create group
+  group:
+    name: '{{ patroni_system.group }}'
+    state: present
+
+- name: Patroni | Create user
+  user:
+    name: '{{ patroni_system.user }}'
+    group: '{{ patroni_system.group }}'
+    system: true

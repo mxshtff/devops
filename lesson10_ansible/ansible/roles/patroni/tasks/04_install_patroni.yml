@@ -1,0 +1,18 @@
+- name: Patroni | Install system packages
+  package:
+    name: '{{ item.name }}'
+    state: '{{ item.state }}'
+    update_cache: yes
+  loop: '{{ patroni_system_packages }}'
+
+- name: Patroni | Install pip packages for patroni
+  pip:
+    name: '{{ item.name }}'
+    state: '{{ item.state }}'
+    umask: '{{ item.umask }}'
+    executable: '{{ item.executable }}'
+  loop: '{{ patroni_pip_packages }}'
+
+
+
+

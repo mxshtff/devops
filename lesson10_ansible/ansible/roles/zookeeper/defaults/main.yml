@@ -1,0 +1,35 @@
+---
+zookeeper_inventory_group: zookeeper
+
+zookeeper:
+  user: zookeeper
+  group: zookeeper
+
+zookeeper_version: '3.7.2'
+zookeeper_download_url: 'https://apache-mirror.rbc.ru/pub/apache/zookeeper/zookeeper-{{ zookeeper_version }}/apache-zookeeper-{{ zookeeper_version }}-bin.tar.gz'
+zookeeper_tarball_dir: /opt/src
+zookeeper_bin_dir: '/opt/zookeeper-{{ zookeeper_version }}-bin'
+zookeeper_bin_dir_symlink: '{{ zookeeper_bin_dir | replace("-" + zookeeper_version + "-bin", "") }}'
+zookeeper_data_dir: /opt/data/zookeeper
+zookeeper_log_dir: '{{ zookeeper_default_log_dir }}'
+zookeeper_force_myid: true
+zookeeper_force_config: true
+zookeeper_service_start: true
+zookeeper_service_autostart: true
+
+# zookeeper config variables
+zookeeper_tick_time: 2000
+zookeeper_init_limit: 10
+zookeeper_sync_limit: 5
+zookeeper_autopurge_purgeInterval: 1
+zookeeper_autopurge_snapRetainCount: 10
+zookeeper_client_port: '{{ zookeeper_zhd_client_port }}'
+zookeeper_server_ports: '{{ zookeeper_zhd_server_ports }}'
+
+zookeeper_instances: 
+  - name: zookeeper-patroni
+    data_dir: "{{ zookeeper_data_dir }}/zk_patroni"
+    log_dir: "{{ zookeeper_data_dir }}/log"
+    config: "{{ zookeeper_bin_dir_symlink }}/conf/zk_patroni.cfg"
+    client_port: "2181"
+    server_port: "2887:3887"

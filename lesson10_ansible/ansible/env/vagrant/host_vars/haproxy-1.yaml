@@ -1,0 +1,2 @@
+haproxy_vrrp_state: "MASTER"
+haproxy_vrrp_unicast_peer: "192.168.56.12"

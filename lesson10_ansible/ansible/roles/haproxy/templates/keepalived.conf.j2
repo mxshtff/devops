@@ -1,0 +1,25 @@
+! Configuration File for keepalived
+
+global_defs {
+}
+
+{% for net in haproxy_vrrp %}
+vrrp_instance VI_{{loop.index}} {
+    state {{ net.state }}
+    interface {{ net.interface_name }}
+    virtual_router_id {{loop.index}}
+    {% if net.state == 'MASTER' %}
+    priority {{ haproxy_vrrp_priority_master }}
+    {% else %}
+    priority {{ haproxy_vrrp_priority_slave }}
+    {% endif %}
+    advert_int 1
+    unicast_src_ip {{ net.unicast_src_ip }}
+    unicast_peer {
+      {{ net.unicast_peer_ip }}
+    }
+    virtual_ipaddress {
+        {{ net.virtual_ip_address }}
+    }
+}
+{% endfor %}

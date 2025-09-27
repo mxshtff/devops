@@ -1,0 +1,15 @@
+- name: Zookeeper | Create system user
+  become: true
+  block:
+
+  - name: Zookeeper | Create group
+    group:
+      name: '{{ zookeeper.group }}'
+      system: true
+
+  - name: Zookeeper | Create user
+    user:
+      name: '{{ zookeeper.user }}'
+      group: '{{ zookeeper.group }}'
+      system: true
+      

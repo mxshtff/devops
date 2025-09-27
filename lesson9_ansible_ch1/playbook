@@ -1,0 +1,16 @@
+---
+- name: Demo
+  hosts: my_group
+  gather_facts: true
+  tasks:
+    - name: Print all vars
+      ansible.builtin.debug:
+        msg: '{{ var_all }}'
+
+    - name: Print group vars
+      ansible.builtin.debug:
+        msg: '{{ var_group }}'
+
+    - name: Print host vars
+      ansible.builtin.debug:
+        msg: '{{ var_host }}'

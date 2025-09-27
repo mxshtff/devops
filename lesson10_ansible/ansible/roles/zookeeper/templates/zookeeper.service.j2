@@ -1,0 +1,23 @@
+# {{ansible_managed}}
+
+[Unit]
+Description=ZooKeeper
+Documentation=http://zookeeper.apache.org
+Requires=network.target
+After=network.target
+
+[Service]
+Type=forking
+WorkingDirectory={{ zookeeper_bin_dir_symlink }}
+SyslogIdentifier={{ item.name }}
+User={{ zookeeper.user }}
+Group={{ zookeeper.group }}
+Environment="ZOO_LOG_DIR={{ item.log_dir }}"
+ExecStart={{ zookeeper_bin_dir_symlink }}/bin/zkServer.sh start {{ item.config }}
+ExecStop={{ zookeeper_bin_dir_symlink }}/bin/zkServer.sh stop {{ item.config }}
+ExecReload={{ zookeeper_bin_dir_symlink }}/bin/zkServer.sh restart {{ item.config }}
+TimeoutSec=30
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,32 @@
+---
+- name: stop postgresql
+  service:
+    name: 'postgresql-{{ patroni_postgresql_version }}'
+    state: stopped
+    enabled: no
+
+- name: restart patroni-watchdog
+  systemd:
+    name: patroni-watchdog
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+  notify:
+    - restart watchdog
+
+- name: restart watchdog
+  systemd:
+    name: watchdog
+    state: restarted
+    enabled: yes
+
+- name: systemd daemon reload
+  systemd:
+    daemon_reload: yes
+
+- name: restart patroni
+  systemd:
+    name: patroni.service
+    state: restarted
+    daemon_reload: yes
+    enabled: yes

@@ -1,0 +1,15 @@
+- name: Patroni | Install PG repo
+  yum:
+    name: '{{ patroni_postgresql_repo }}'
+    state: present
+    validate_certs: no
+
+- name: Patroni | Install PG packages
+  package:
+    name: '{{ item.name }}'
+    state: '{{ item.state }}'
+    update_cache: yes
+  loop: '{{ patroni_postgresql_packages }}'
+  notify:
+    - stop postgresql
+ 

@@ -1,0 +1,5 @@
+@Library('build') _
+
+buildPipeline {
+    APPS_FILE = 'apps/apps.json'
+}

@@ -1,0 +1,100 @@
+pipeline {
+    agent any
+
+    tools {
+        maven "3.9.2"
+    }
+
+    environment {
+        VERSION = "1.0.${BUILD_NUMBER}" // global ENVs  ${YOUR_JENKINS_URL}/pipeline-syntax/globals#env
+        MAVEN_REPO_PATH = "${WORKSPACE}/.m2/repository"
+    }
+
+    stages {
+        stage('Parallel CI') {
+            // when {
+            //     expression { BRANCH ==~ /PR-\d+/ }
+            // }
+            parallel {
+                stage('hello-world') {
+                    stages {
+                        stage('Build') {
+                            steps {
+                                dir('apps/hello-world') {
+                                    sh "mvn -B -DskipTests -Dmaven.repo.local=${MAVEN_REPO_PATH} -Dversion.application=${env.VERSION} clean package"
+                                }
+                            }
+                        }
+                        stage('Test') {
+                            steps {
+                                dir('apps/hello-world') {
+                                    sh 'mvn test'
+                                }
+                            }
+                        }
+                    }
+                    post {
+                        success {
+                            dir('apps/hello-world') {
+                                junit 'target/surefire-reports/*.xml'
+                            }
+                        }
+                    }
+                }
+
+                stage('hello-jenkins') {
+                    stages {
+                        stage('Build') {
+                            steps {
+                                dir('apps/hello-jenkins') {
+                                    sh "mvn -B -DskipTests -Dmaven.repo.local=${MAVEN_REPO_PATH} -Dversion.application=${env.VERSION} clean package"
+                                }
+                            }
+                        }
+                        stage('Test') {
+                            steps {
+                                dir('apps/hello-jenkins') {
+                                    sh 'mvn test'
+                                }
+                            }
+                        }
+                    }
+                    post {
+                        success {
+                            dir('apps/hello-jenkins') {
+                                junit 'target/surefire-reports/*.xml'
+                            }
+                        }
+                    }
+                }
+                
+                stage('hello-devops') {
+                    stages {
+                        stage('Build') {
+                            steps {
+                                dir('apps/hello-devops') {
+                                    sh "mvn -B -DskipTests -Dmaven.repo.local=${MAVEN_REPO_PATH} -Dversion.application=${env.VERSION} clean package"
+                                }
+                            }
+                        }
+                        stage('Test') {
+                            steps {
+                                dir('apps/hello-devops') {
+                                    sh 'mvn test'
+                                }
+                            }
+                        }
+                    }
+                    post {
+                        success {
+                            dir('apps/hello-devops') {
+                                junit 'target/surefire-reports/*.xml'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

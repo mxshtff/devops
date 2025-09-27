@@ -1,0 +1,66 @@
+# Префикс для LAN сети
+BRIDGE_NET="192.168.56."
+
+DOMAIN="test"
+
+MACHINES = {
+  :ansible => {
+    :box_name => "bento/ubuntu-20.04",
+    :host_name => "ansible",  
+    :ip_addr => BRIDGE_NET + "110",
+    :cpu => 1,
+    :ram => 1024, # Megabytes
+  },
+  :haproxy1 => {
+    :box_name => "centos/7",
+    :host_name => "haproxy-1",  
+    :ip_addr => BRIDGE_NET + "11",
+    :cpu => 1,
+    :ram => 1024
+  },
+  :haproxy2 => {
+    :box_name => "centos/7",
+    :host_name => "haproxy-2",  
+    :ip_addr => BRIDGE_NET + "12",
+    :cpu => 1,
+    :ram => 1024
+  },
+  :postgres1 => {
+    :box_name => "centos/7",
+    :host_name => "postgres-1",  
+    :ip_addr => BRIDGE_NET + "13",
+    :cpu => 1,
+    :ram => 1024
+  },
+  :postgres2 => {
+    :box_name => "centos/7",
+    :host_name => "postgres-2",  
+    :ip_addr => BRIDGE_NET + "14",
+    :cpu => 1,
+    :ram => 1024
+  }
+}
+
+Vagrant.configure("2") do |config|
+    MACHINES.each do |boxname, boxconfig|                   # Проходим по элементах массива "servers"
+        config.vm.define boxname do |box|
+            box.vm.box = boxconfig[:box_name]               # Поднять машину из образа
+            box.vm.host_name = boxconfig[:host_name]        # Hostname который будет присвоен VM (самой ОС)
+            box.vm.usable_port_range = (2200..2250)         # Пул портов, который будет использоваться для подключения к каждый VM через 127.0.0.1
+            box.vm.network "private_network", ip: boxconfig[:ip_addr]
+            box.vm.provider :virtualbox do |vb|
+                vb.name = boxconfig[:host_name]     # Можно перезаписать название VM в Vbox GUI
+                vb.cpus = boxconfig[:cpu]
+                vb.memory = boxconfig[:ram]
+            end
+            # Выполнение настроечных скриптов в ОС
+            # SHELL
+            box.vm.provision "shell", path: "scripts/centos_preconfig.sh"
+            box.vm.provision "shell", path: "scripts/ansible.sh"
+        end
+
+        if boxname == "ansible"
+          config.vm.synced_folder "../ansible", "/ansible"
+        end
+    end
+end

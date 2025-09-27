@@ -1,0 +1,27 @@
+- name: Zookeeper | Configure
+  become: true
+  block:
+
+  - name: Configure zookeeper | Write myid file
+    template:
+      src: myid.j2
+      dest: '{{ item.data_dir }}/myid'
+      owner: '{{ zookeeper.user }}'
+      group: '{{ zookeeper.group }}'
+      force: '{{ zookeeper_force_myid }}'
+    loop: '{{ zookeeper_instances }}'
+
+  - name: Configure zookeeper | Add zookeeper config files
+    template:
+      src: zoo.cfg.j2
+      dest: '{{ item.config }}'
+      owner: '{{ zookeeper.user }}'
+      group: '{{ zookeeper.group }}'
+      force: '{{ zookeeper_force_config }}'
+    loop: '{{ zookeeper_instances }}'
+
+  - name: Configure zookeeper | Add zookeeper bin dir to the PATH
+    template:
+      src: zookeeper_path.sh.j2
+      dest: /etc/profile.d/zookeeper_path.sh
+      mode: 0755

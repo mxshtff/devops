@@ -1,0 +1,9 @@
+# -------------------- Блок установок rpm пакетов --------------------
+- name: HaProxy | Install packages
+  become: true
+  block:
+  
+  - name: HaProxy | Install yum packages
+    yum:
+      name: '{{ haproxy_yum_packages }}'
+      state: present

@@ -1,0 +1,92 @@
+scope: {{ patroni_scope }}
+namespace: {{ patroni_namespace }}
+name: {{ patroni_name }}
+restapi:
+  listen: {{ patroni_restapi_listen }}
+  connect_address: {{ patroni_restapi_connect_address }}
+zookeeper:
+  hosts:
+{% set zoo_servers = [] -%}
+{% for host in groups[zookeeper_inventory_group] -%}
+{{ zoo_servers.append(dict(id=loop.index, host=hostvars[host]['inventory_hostname'])) -}}
+{% endfor -%}
+{%- for server in zoo_servers %}
+{%- if server.host is defined %}
+  - {{ server.host }}:{{ patroni_zookeeper_port }}
+{% endif %}
+{% endfor %}
+bootstrap:
+  dcs:
+    ttl: {{ patroni_bootstrap_dcs_ttl }}
+    loop_wait: {{ patroni_bootstrap_dcs_loop_wait }}
+    retry_timeout: {{ patroni_bootstrap_dcs_retry_timeout }}
+    maximum_lag_on_failover: {{ patroni_bootstrap_dcs_maximum_lag_on_failover }}
+    master_start_timeout: {{ patroni_bootstrap_dcs_master_start_timeout }}
+    synchronous_mode: {{ patroni_bootstrap_dcs_synchronous_mode }}
+    synchronous_mode_strict: {{ patroni_bootstrap_dcs_synchronous_mode_strict }}
+    check_timeline: {{ patroni_bootstrap_dcs_check_timeline }}
+    postgresql:
+      use_pg_rewind: {{ patroni_bootstrap_dcs_postgresql_use_pg_rewind }}
+      use_slots: {{ patroni_bootstrap_dcs_postgresql_use_slots }}
+      parameters:
+{% for parameter in patroni_bootstrap_dcs_postgresql_parameters %}
+        {{ parameter.option }}: {{ parameter.value }}
+{% endfor %}
+  initdb:
+{% for item in patroni_bootstrap_initdb %}
+{% if item.value is undefined %}
+    - {{ item.option }}
+{% else %}
+    - {{ item.option }}: {{ item.value }}
+{% endif %}
+{% endfor %}
+  pg_hba:
+{% for client in patroni_bootstrap_dcs_postgresql_pg_hba %}
+    - {{ client.type }} {{ client.database }} {{ client.user }} {{ client.address }} {{ client.method }}
+{% endfor %}
+  users:
+{% for user in patroni_bootstrap_users %}
+    {{ user.name }}:
+      password: {{ user.password }}
+{% if user.options |length > 0 %}
+      options:
+{% for option in user.options %}
+        - {{ option }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+postgresql:
+  use_unix_socket: {{ patroni_postgresql_use_unix_socket }}
+  listen: {{ patroni_postgresql_listen }}
+  connect_address: {{ patroni_postgresql_connect_address }}
+  data_dir: {{ patroni_postgresql_data_dir }}
+  bin_dir: {{ patroni_postgresql_bin_dir }}
+  config_dir: {{ patroni_postgresql_config_dir }}
+  pgpass: {{ patroni_postgresql_pgpass }}
+  authentication:
+{% for role in patroni_postgresql_authentication %}
+    {{ role.type }}:
+      username: {{ role.username }}
+      password: {{ role.password }}
+{% endfor %}
+  create_replica_methods:
+{% for create_replica_method in patroni_postgresql_create_replica_methods %}
+    - {{ create_replica_method }}
+{% endfor %}
+  parameters:
+{% for item in patroni_postgresql_parameters %}
+    {{ item.option }}: {{ item.value }}
+{% endfor %}
+
+watchdog:
+  mode: {{ patroni_watchdog_mode }}
+  device: {{ patroni_watchdog_device }}
+  safety_margin: {{ patroni_watchdog_safety_margin }}
+
+tags:
+{% for tag in patroni_tags %}
+{% if tag.value %}
+  {{ tag.name }}: {{ tag.value }}
+{% endif %}
+{% endfor %}

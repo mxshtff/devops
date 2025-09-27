@@ -1,0 +1,12 @@
+{%- set ips = [] %}
+{%- for i in groups[zookeeper_inventory_group] %}
+{{- ips.append(dict(id=loop.index, host=i)) }}
+{%- endfor %}
+{% for server in ips %}
+{% if server.host is defined %}
+{% if server.host == inventory_hostname %}
+{{ server.id }}
+{% endif %}
+{% endif %}
+{% endfor %}
+

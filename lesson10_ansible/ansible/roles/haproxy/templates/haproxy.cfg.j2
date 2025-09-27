@@ -1,0 +1,31 @@
+{{ ansible_managed | comment }}
+
+global
+   maxconn 100
+   user {{ haproxy.user }}
+   group {{ haproxy.group }}
+defaults
+   log global
+   mode tcp
+   retries 2
+   timeout client 30m
+   timeout connect 4s
+   timeout server 30m
+   timeout check 5s
+
+listen stats
+   mode http
+   bind *:7000
+   stats enable
+   stats uri /
+
+{% for listen in haproxy_listens %}
+listen {{ listen.name }}
+   bind {{ listen.bind }}
+   option {{ listen.option }}
+   http-check expect status 200
+   default-server inter 3s fall 3 rise 2 on-marked-down shutdown-sessions
+{% for server in listen.servers %}
+   server {{ server.name }} {{ server.address }}{% if 'maxconn' in server %} maxconn {{ server.maxconn }}{% endif %} check{% if 'port' in server %} port {{ server.port }}{% endif %}\n
+{% endfor %}
+{% endfor %}

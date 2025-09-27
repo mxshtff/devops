@@ -1,0 +1,6 @@
+- name: Patroni install
+  become: true
+  hosts: patroni
+    
+  tasks:
+    - include_role: name=patroni

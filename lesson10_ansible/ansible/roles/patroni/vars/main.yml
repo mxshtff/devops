@@ -1,0 +1,22 @@
+---
+patroni_postgresql_repo: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+patroni_postgresql_packages:
+  - { name: "postgresql{{ patroni_postgresql_version}}",         state: "present" }
+  - { name: "postgresql{{ patroni_postgresql_version}}-server",  state: "present" }
+  - { name: "postgresql{{ patroni_postgresql_version}}-contrib", state: "present" }
+  # - { name: "postgresql{{ patroni_postgresql_version}}-devel",   state: "present" }
+
+patroni_system_packages:
+  # - { name: "centos-release-scl-rh",  state: "present" }
+  - { name: "llvm-toolset-7-clang",   state: "present" }
+  - { name: "python-setuptools",      state: "present" }
+  - { name: "epel-release",           state: "present" }
+  - { name: "gcc",                    state: "present" }
+  - { name: "python3-devel",          state: "present" }
+  - { name: "python3-psycopg2",       state: "present" }
+  - { name: "python3-pip",            state: "present" }
+  - { name: "jq",                     state: "present" }
+
+patroni_pip_packages:
+  - { name: "setuptools",                 state: "latest",  umask: "0022", executable: "pip3" }
+  - { name: "patroni[{{ patroni_dcs }}]", state: "present", umask: "0022", executable: "pip3" }

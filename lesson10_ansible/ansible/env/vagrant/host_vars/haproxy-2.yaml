@@ -1,0 +1,2 @@
+haproxy_vrrp_state: "SLAVE"
+haproxy_vrrp_unicast_peer: "192.168.56.11"

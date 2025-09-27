@@ -1,0 +1,9 @@
+---
+# tasks file for patroni
+- include: 01_user_create.yml
+- include: 02_install_postgresql.yml
+- include: 03_watchdog.yml
+- include: 04_install_patroni.yml
+- include: 05_configure_patroni.yml
+# - meta: flush_handlers
+

@@ -1,0 +1,14 @@
+# ./monitoring.timer
+
+[Unit]
+Description=Example monitoring timer
+
+[Timer]
+# Этот таймер запускает сервис monitoring.service
+Unit=monitoring.service
+# Если требуются более конкретные даты и время, события OnCalendar используют следующий формат:
+# DayOfWeek Year-Month-Day Hour:Minute:Second
+OnCalendar=*-*-* *:*:00
+
+[Install]
+WantedBy=timers.target

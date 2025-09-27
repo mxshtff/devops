@@ -1,0 +1,18 @@
+---
+- name: Configure /etc/hosts
+  become: true
+  block:
+
+  - name: Configure | Add servers to /etc/hosts
+    blockinfile:
+      path: /etc/hosts
+      block: '{{ hostvars[item].ansible_host }} {{ hostvars[item].inventory_hostname }}'
+      marker: "# {mark} ANSIBLE MANAGED BLOCK {{ hostvars[item].inventory_hostname }}"
+    loop: "{{ groups['all'] }}"
+  
+  - name: Configure | comment 127.0.1.1 /etc/hosts
+    lineinfile:
+      path: /etc/hosts
+      state: present
+      regexp: '^127.0.1.1'
+      line: '# 127.0.1.1'

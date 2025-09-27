@@ -1,0 +1,30 @@
+- name: Zookeeper | Service
+  become: true
+  block:
+
+  # - name: Service zookeeper | Systemd to reread configs
+  #   ansible.builtin.systemd:
+  #     daemon_reload: yes
+
+  - name: Service zookeeper | Create systemd script
+    template:
+      src: zookeeper.service.j2
+      dest: '/usr/lib/systemd/system/{{ item.name }}.service'
+    loop: '{{ zookeeper_instances }}'
+    notify:
+      - Restart zookeeper
+
+  # - name: Restart zookeeper
+  #   ansible.builtin.systemd:
+  #     daemon_reload: yes
+  #     name: '{{ item.name }}'
+  #     state: restarted
+  #     enabled: true
+  #   loop: '{{ zookeeper_instances }}'
+
+  # - name: Service zookeeper | Start and Enable zookeeper service
+  #   service:
+  #     name: '{{ item.name }}'
+  #     enabled: yes
+  #     state: restarted
+  #   loop: '{{ zookeeper_instances }}'

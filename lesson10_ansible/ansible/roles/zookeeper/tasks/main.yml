@@ -1,0 +1,6 @@
+---
+# tasks file for zhd.zookeeper
+- include: 01_user_create.yml
+- include: 02_install.yml
+- include: 03_configure.yml
+- include: 04_service.yml

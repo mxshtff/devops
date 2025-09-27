@@ -26,4 +26,4 @@ USER appuser
 EXPOSE 8080
 
 # Run application
-CMD ["java", "-jar", "target/digital-library-${VERSION}.jar"]
+CMD ["sh", "-c", "java -jar target/digital-library-${VERSION:-1.0.0}.jar"]

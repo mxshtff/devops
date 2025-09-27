@@ -1,0 +1,88 @@
+pipeline {
+    agent any
+    
+    parameters {
+        string(name: 'ARTIFACT_NAME', defaultValue: 'digital-library-1.0.0.jar', description: 'Имя артефакта для деплоя')
+        string(name: 'BUILD_NUMBER', defaultValue: '1', description: 'Номер сборки')
+    }
+    
+    environment {
+        VERSION = "${params.BUILD_NUMBER}"
+        ARTIFACT_PATH = "apps/webbooks/target/${params.ARTIFACT_NAME}"
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Download Artifact') {
+            steps {
+                script {
+                    // В реальном сценарии здесь бы скачивался артефакт из Nexus/Artifactory
+                    // Для демонстрации используем существующий артефакт
+                    echo "Downloading artifact: ${params.ARTIFACT_NAME}"
+                    echo "Build number: ${params.BUILD_NUMBER}"
+                }
+            }
+        }
+        
+        stage('Stop Old Container') {
+            steps {
+                sh 'docker-compose -f lesson12NEW_cicd/docker-compose.yml stop webbooks-app || true'
+            }
+        }
+        
+        stage('Build New Image') {
+            steps {
+                script {
+                    // Обновляем переменную окружения для версии
+                    sh "echo 'VERSION=${VERSION}' > lesson12NEW_cicd/.env"
+                    sh 'docker-compose -f lesson12NEW_cicd/docker-compose.yml build webbooks-app'
+                }
+            }
+        }
+        
+        stage('Deploy Container') {
+            steps {
+                sh 'docker-compose -f lesson12NEW_cicd/docker-compose.yml up -d webbooks-app'
+            }
+        }
+        
+        stage('Wait for Startup') {
+            steps {
+                sleep 30
+            }
+        }
+        
+        stage('Health Check') {
+            steps {
+                script {
+                    // Проверяем доступность приложения
+                    sh 'curl -f http://localhost:8081/actuator/health || curl -f http://localhost:8081/ || exit 1'
+                }
+            }
+        }
+        
+        stage('Verify Deployment') {
+            steps {
+                sh 'docker-compose -f lesson12NEW_cicd/docker-compose.yml ps webbooks-app'
+                sh 'docker-compose -f lesson12NEW_cicd/docker-compose.yml logs --tail=50 webbooks-app'
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            echo "Deployment completed successfully for artifact: ${params.ARTIFACT_NAME}"
+        }
+        failure {
+            echo "Deployment failed for artifact: ${params.ARTIFACT_NAME}"
+        }
+    }
+}

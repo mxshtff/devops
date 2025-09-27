@@ -76,7 +76,7 @@ pipeline {
     
     post {
         always {
-            cleanWs()
+            deleteDir()
         }
         success {
             echo "Deployment completed successfully for artifact: ${params.ARTIFACT_NAME}"

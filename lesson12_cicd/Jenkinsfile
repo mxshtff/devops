@@ -74,7 +74,7 @@ pipeline {
     post {
         always {
             // Очистка workspace
-            cleanWs()
+            deleteDir()
         }
         success {
             echo 'Pipeline completed successfully!'

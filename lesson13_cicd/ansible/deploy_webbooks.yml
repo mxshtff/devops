@@ -1,0 +1,12 @@
+---
+- name: Deploy Webbooks application
+  hosts: "{{ target_group | default('webbooks') }}"
+  become: true
+  vars:
+    artifact_name: "{{ artifact_name }}"
+    artifact_url: "https://github.com/owner/repo/packages/artifacts/{{ artifact_name }}"
+
+  roles:
+    - role: deploy
+
+

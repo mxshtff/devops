@@ -1,0 +1,30 @@
+---
+- name: Ensure install directory exists
+  file:
+    path: "{{ install_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Download artifact (replace URL/auth as needed)
+  get_url:
+    url: "{{ artifact_url }}"
+    dest: "{{ install_dir }}/{{ artifact_name }}"
+    mode: '0644'
+
+- name: Install systemd unit
+  template:
+    src: webbooks.service.j2
+    dest: /etc/systemd/system/{{ service_name }}.service
+    mode: '0644'
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: true
+
+- name: Enable and restart service
+  systemd:
+    name: "{{ service_name }}"
+    enabled: true
+    state: restarted
+
+

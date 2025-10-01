@@ -1,0 +1,14 @@
+[Unit]
+Description=Webbooks Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart={{ java_path }} -jar {{ install_dir }}/{{ artifact_name }}
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+

@@ -1,0 +1,5 @@
+service_name: webbooks
+install_dir: /opt/webbooks
+java_path: /usr/bin/java
+
+
